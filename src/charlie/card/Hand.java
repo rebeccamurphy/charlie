@@ -101,7 +101,7 @@ public class Hand implements Serializable {
     }
     
     /**
-     * Tests if the had is a pair.
+     * Tests if the hand is a pair.
      * @return True if hand has 2+2, 3+3, etc.
      */
     public boolean isPair() {

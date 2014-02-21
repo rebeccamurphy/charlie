@@ -1,3 +1,6 @@
 /build/
 /audio
 /dist/
+/CharliePlugins/build/
+/CharliePlugins/dist/
+/CharliePlugins/nbproject/private/
