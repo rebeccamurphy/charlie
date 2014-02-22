@@ -10,6 +10,8 @@ import charlie.card.Card;
 import charlie.card.Hand;
 import charlie.util.Play;
 import static charlie.util.Play.*;
+import java.util.Hashtable;
+
 
 /**
  *
@@ -17,7 +19,7 @@ import static charlie.util.Play.*;
  */
 public class basicStrategy {
     
-     char[][] strategyKey= new char[][] {
+     static char[][] strategyKey= new char[][] {
        // 2,   3,   4,   5,   6,   7,   8,   9,   10,  A 
         {'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S' }, //17+  |0
         {'S', 'S', 'S', 'S', 'S', 'H', 'H', 'H', 'H', 'H' }, //16   |1
@@ -52,8 +54,63 @@ public class basicStrategy {
          
     };
      
-    public Play charToEnum(char t)
+    //Hashtable <Integer, Integer> playerHandPairs = new Hashtable<Integer,Integer>();
+    //playerHandPairs.put(new Integer 8, new Integer 17);
+  static Hashtable<Integer, Integer > playerHandValueLoc = new Hashtable<Integer, Integer>(){{
+        put(5,9);
+        put(6,9);
+        put(7,9);
+        put(8,9);
+        
+        int j = 0;
+        for (int i=17;i>8  ; i--)
+        {
+            put(i, j);
+            j++;
+        }        
+    }};
+     
+     
+     static Hashtable<Integer, Integer > playerHandAceLoc = new Hashtable<Integer, Integer>(){{
+        put(8,10);
+        put(9,10);
+        put(10,10);
+        
+        int j = 11;
+        for (int i=7;i>1  ; i--)
+        {
+            put(i, j);
+            j++;
+        }        
+    }};
+     
+     static Hashtable<Integer, Integer > playerHandPairsLoc = new Hashtable<Integer, Integer>(){{
+        put(1,17);
+        put(8,17);
+        int j = 18;
+        for (int i=10;i>1  ; i--)
+        {
+            put(i, j);
+            j++;
+        }        
+    }};
+  
+     static Hashtable<Integer, Integer > dealerUpCardLocs = new Hashtable<Integer, Integer>(){{
+        put(1,9);
+        
+        int j = 0;
+        for (int i=2;i<11  ; i++)
+        {
+            put(i, j);
+            j++;
+        }        
+    }};
+  
+    public basicStrategy()
+    {}
+    public static Play charToEnum(char t)
     {
+        
         switch (t){
             case 'H':
                return HIT;
@@ -66,58 +123,35 @@ public class basicStrategy {
             default: 
                 return NONE;
            }
-    }
-    
-    public Play advise(Hand myHand, Card upCard)
-    {
         
     }
     
-    public int getmyHandLoc( Hand myHand, Card upCard)
+   
+    
+    public static char  getAdvice( Hand myHand, Card upCard)
     {
-        int yourHand;
-        int dealerUpCard;
+        int yourHandLoc;
+        int dealerUpCardLoc;
         
-        if (myHand.isPair())
-        {
-           switch (myHand.getCard(0).value())
-           {
-               case 1:
-               case 8:
-                   yourHand = 17;
-                   return yourHand;
-               case 10:
-                   yourHand = 18;
-                   return yourHand;
-               case 9:
-                   yourHand = 19;
-                   return yourHand;
-               case 7:
-                   yourHand = 20;
-                   return yourHand;
-               case 6:
-                   yourHand = 21;
-                   return yourHand;
-               case 5:
-                   yourHand = 22;
-                   return yourHand;
-               case 4:
-                   yourHand = 23;
-                   return yourHand;
-               case 3:
-                   yourHand = 24;
-                   return yourHand;
-               case 2:
-                   yourHand = 25;
-                   return yourHand;
-                   
-           }
-        }
+        if (myHand.isPair())//pair check
+            yourHandLoc = playerHandPairsLoc.get(myHand.getCard(0).value());
+        else if (myHand.getCard(0).isAce()) //Ace might be more than one
+            yourHandLoc = playerHandAceLoc.get(myHand.getCard(1).value());
+        else if (myHand.getCard(1).isAce()) //another ace check
+            yourHandLoc = playerHandAceLoc.get(myHand.getCard(0).value());
+        else 
+            yourHandLoc = playerHandValueLoc.get(myHand.getValue());
+            
+        dealerUpCardLoc = dealerUpCardLocs.get(upCard.value());
+        
+        return strategyKey[yourHandLoc][dealerUpCardLoc];
     }
-    public Play getPlay (Hand myHand, Card upCard)
+    public static Play getPlay (Hand myHand, Card upCard)
     {
         //NONE, HIT, STAY, DOUBLE_DOWN, SPLIT
-        return NONE;
+        char advice = getAdvice(myHand, upCard);
+        return charToEnum(advice);
+        
     }
     
 }
