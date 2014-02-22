@@ -20,7 +20,9 @@ public class myAdvisor implements IAdvisor {
     @Override
 
     public Play advise(Hand myHand, Card upCard) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        return basicStrategy.getPlay(myHand, upCard);
+       
     }
    
 }
