@@ -15,11 +15,23 @@ import charlie.util.Play;
  *
  * @author Rebecca
  */
-public class myAdvisor implements IAdvisor {
-
+public class MyAdvisor implements IAdvisor {
+//  Hit =H, Stand =A, DD= D, SP =P
     @Override
+
     public Play advise(Hand myHand, Card upCard) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        return basicStrategy.getPlay(myHand, upCard);
+       
     }
-    
+   
 }
+    
+    
+    
+        
+    
+    
+     
+    
+
