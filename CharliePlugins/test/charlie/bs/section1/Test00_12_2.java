@@ -64,34 +64,4 @@ public class Test00_12_2 {
         assertEquals(expectedPlay, result);
         
     }
-    
-    @Test
-    public void testRow16()
-    {
-        
-    }
-    
-    @Test
-    public void testRow15()
-    {
-        
-    }
-    
-    @Test
-    public void testRow14()
-    {
-        
-    }
-    
-    @Test
-    public void testRow13()
-    {
-        
-    }
-    
-    @Test
-    public void testRow12()
-    {
-        
-    }
 }
