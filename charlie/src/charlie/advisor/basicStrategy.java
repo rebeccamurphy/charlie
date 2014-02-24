@@ -90,8 +90,11 @@ public class basicStrategy {
      static Hashtable<Integer, Integer > playerHandPairsLoc = new Hashtable<Integer, Integer>(){{
         put(1,17);
         put(8,17);
-        int j = 18;
-        for (int i=10;i>1  ; i--)
+        put(10,18);
+        put(9,19);
+        
+        int j = 20;
+        for (int i=7;i>1  ; i--)
         {
             put(i, j);
             j++;
@@ -137,7 +140,8 @@ public class basicStrategy {
         int dealerUpCardLoc;
         
         if (myHand.isPair())//pair check
-            yourHandLoc = playerHandPairsLoc.get(myHand.getCard(0).value());
+         yourHandLoc = playerHandPairsLoc.get(myHand.getCard(0).value());
+      
         else if (myHand.getCard(0).isAce()) //Ace might be more than one
             yourHandLoc = playerHandAceLoc.get(myHand.getCard(1).value());
         else if (myHand.getCard(1).isAce()) //another ace check
@@ -146,7 +150,7 @@ public class basicStrategy {
             yourHandLoc = playerHandValueLoc.get(myHand.getValue());
             
         dealerUpCardLoc = dealerUpCardLocs.get(upCard.value());
-        
+        System.out.println(yourHandLoc +" " + dealerUpCardLoc);
         return strategyKey[yourHandLoc][dealerUpCardLoc];
     }
     public static Play getPlay (Hand myHand, Card upCard)
