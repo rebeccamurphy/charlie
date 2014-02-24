@@ -21,7 +21,7 @@ public class MyAdvisor implements IAdvisor {
 
     public Play advise(Hand myHand, Card upCard) {
         
-        return basicStrategy.getPlay(myHand, upCard);
+        return BasicStrategy.getPlay(myHand, upCard);
        
     }
    
