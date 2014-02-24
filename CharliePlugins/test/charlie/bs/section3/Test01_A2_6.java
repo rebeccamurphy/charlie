@@ -4,6 +4,13 @@
  */
 package charlie.bs.section3;
 
+import charlie.advisor.MyAdvisor;
+import charlie.card.Card;
+import charlie.card.Hand;
+import charlie.card.Hid;
+import charlie.dealer.Seat;
+import charlie.plugin.IAdvisor;
+import charlie.util.Play;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -16,7 +23,7 @@ import static org.junit.Assert.*;
  * @author Wallance Miranda
  */
 public class Test01_A2_6 {
-    
+     private static IAdvisor advisor;
     public Test01_A2_6() {
     }
     
@@ -30,6 +37,7 @@ public class Test01_A2_6 {
     
     @Before
     public void setUp() {
+        advisor = new MyAdvisor();
     }
     
     @After
@@ -38,6 +46,21 @@ public class Test01_A2_6 {
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //
-    // @Test
-    // public void hello() {}
+    @Test
+    
+     public void test()
+    {
+        // Test row "A,5" and collumn 5
+        Hid hid = new Hid(Seat.YOU, 1.0, 1.5);
+        Hand hand = new Hand(hid);
+        
+        hand.hit(new Card(1, Card.Suit.CLUBS));
+        hand.hit(new Card(5, Card.Suit.DIAMONDS));        
+        
+        Play result = advisor.advise(hand, new Card(5, Card.Suit.CLUBS));
+        Play expectedPlay = Play.DOUBLE_DOWN;
+        
+        assertEquals(expectedPlay, result);
+        
+    }
 }

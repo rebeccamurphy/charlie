@@ -45,6 +45,7 @@ public class Test00_12_2 {
     
     @After
     public void tearDown() {
+        
     }
     
     @Test
@@ -61,6 +62,7 @@ public class Test00_12_2 {
         Play expectedPlay = Play.HIT;
         
         assertEquals(expectedPlay, result);
+        
     }
     
     @Test
