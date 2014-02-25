@@ -18,20 +18,24 @@ import java.util.Hashtable;
  * @author Rebecca
  */
 public class basicStrategy {
-    
-     static char[][] strategyKey= new char[][] {
-       // 2,   3,   4,   5,   6,   7,   8,   9,   10,  A 
+     //Multidimensional Array containing the strategy table
+     final static char[][] strategyKey= new char[][] {
+       // 0    1    1    3    4    5    6    7    8    9 | Second position
+         
+       // 2,   3,   4,   5,   6,   7,   8,   9,   10,  A     //First Position
         {'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S' }, //17+  |0
         {'S', 'S', 'S', 'S', 'S', 'H', 'H', 'H', 'H', 'H' }, //16   |1
         {'S', 'S', 'S', 'S', 'S', 'H', 'H', 'H', 'H', 'H' }, //15   |2
         {'S', 'S', 'S', 'S', 'S', 'H', 'H', 'H', 'H', 'H' }, //14   |3
         {'S', 'S', 'S', 'S', 'S', 'H', 'H', 'H', 'H', 'H' }, //13   |4
         {'H', 'H', 'S', 'S', 'S', 'H', 'H', 'H', 'H', 'H' }, //12   |5
+        //section 1
         
         {'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'H' }, //11   |6
         {'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'H', 'H' }, //10   |7
         {'H', 'D', 'D', 'D', 'D', 'H', 'H', 'H', 'H', 'H' }, // 9   |8
         {'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H' }, // 5-8 |9
+        //section 2
         
         {'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S' }, // A, 8-10 |10
         {'S', 'D', 'D', 'D', 'D', 'S', 'S', 'H', 'H', 'H' }, // A, 7    |11
@@ -40,6 +44,7 @@ public class basicStrategy {
         {'H', 'H', 'D', 'D', 'D', 'H', 'H', 'H', 'H', 'H' }, // A, 4    |14
         {'H', 'H', 'H', 'D', 'D', 'H', 'H', 'H', 'H', 'H' }, // A, 3    |15
         {'H', 'H', 'H', 'D', 'D', 'H', 'H', 'H', 'H', 'H' }, // A, 2    |16
+        //section 3
         
         {'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P' }, // A, A,8,8    |17
         {'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'S' }, // 10, 10      |18
@@ -50,36 +55,44 @@ public class basicStrategy {
         {'H', 'H', 'H', 'P', 'P', 'H', 'H', 'H', 'H', 'H' }, // 4,  4       |23
         {'P', 'P', 'P', 'P', 'P', 'P', 'H', 'H', 'H', 'H' }, // 3,  3       |24
         {'P', 'P', 'P', 'P', 'P', 'P', 'H', 'H', 'H', 'H' }, // 2,  2       |25
+        //section 4
         
          
     };
      
-    //Hashtable <Integer, Integer> playerHandPairs = new Hashtable<Integer,Integer>();
-    //playerHandPairs.put(new Integer 8, new Integer 17);
-  static Hashtable<Integer, Integer > playerHandValueLoc = new Hashtable<Integer, Integer>(){{
-        put(5,9);
+    
+  static Hashtable<Integer, Integer > playerHandValueLocs = new Hashtable<Integer, Integer>(){{
+      //Hash table representing the Locations of section 1 and 2 rows of the strategy table, hands values 5-17+
+      //put(Card.value(), corresponding strategyKey table row)
+        // 5-8
+        put(5,9); 
         put(6,9);
         put(7,9);
         put(8,9);
         
-        for (int i =17; i<22; i++ )
-            put(i, 0);
-        
         int j = 1;
+        // 12 - 16
         for (int i=16;i>8  ; i--)
         {
             put(i, j);
             j++;
-        }        
+        } 
+        //17+
+        for (int i =17; i<22; i++ )
+            put(i, 0);
+         
     }};
      
      
-     static Hashtable<Integer, Integer > playerHandAceLoc = new Hashtable<Integer, Integer>(){{
-        put(8,10);
-        put(9,10);
-        put(10,10);
-        
+     static Hashtable<Integer, Integer > playerHandAceLocs = new Hashtable<Integer, Integer>(){{
+      //Hash table representing the Locations of section 3 rows of the strategy table, Hands containing an Ace
+      //put(Card.value(), corresponding strategyKey table row)
+        put(10,10);//A, 10 
+        put(9,10); //A, 9 
+        put(8,10); //A, 8
+     
         int j = 11;
+        // A, 7 - A, 2 
         for (int i=7;i>1  ; i--)
         {
             put(i, j);
@@ -87,13 +100,17 @@ public class basicStrategy {
         }        
     }};
      
-     static Hashtable<Integer, Integer > playerHandPairsLoc = new Hashtable<Integer, Integer>(){{
-        put(1,17);
-        put(8,17);
-        put(10,18);
-        put(9,19);
+     static Hashtable<Integer, Integer > playerHandPairsLocs = new Hashtable<Integer, Integer>(){{
+      //Hash table representing the Locations of section 4 rows of the strategy table, the pairs
+      //put(Card.value(), corresponding strategyKey table row)
+        put(1,17);  //A, A
+        put(11, 17); //A, A
+        put(8,17);  //8, 8
+        put(10,18); //10, 10
+        put(9,19);  //9, 9
         
-        int j = 20;
+        int j = 20; 
+        // 7,7 - 2,2
         for (int i=7;i>1  ; i--)
         {
             put(i, j);
@@ -102,19 +119,64 @@ public class basicStrategy {
     }};
   
      static Hashtable<Integer, Integer > dealerUpCardLocs = new Hashtable<Integer, Integer>(){{
-        put(1,9);
-        
+      //Hash table representing the Locations of Dealers up card collumns, 2 - A
+      //put(Card.value(), corresponding strategyKey table collumn)
+
         int j = 0;
+        // 2 - 10
         for (int i=2;i<11  ; i++)
         {
             put(i, j);
             j++;
-        }        
+        }
+        put(1,9); // Ace
     }};
-  
-    public basicStrategy()
-    {}
-    public static Play charToEnum(char t)
+  /**
+     * This function checks if there is an Ace in the players hand. 
+     * @param myHand
+     * @return true if Ace, false otherwise
+     */
+    
+    private static boolean containsAce (Hand myHand)
+    {
+        for (int i =0; i< myHand.size(); i++)
+            if (myHand.getCard(i).isAce())
+                return true;
+        return false;
+    }
+    /**
+     * This function get the location of the Ace in a hand.
+     * @param myHand
+     * @return 
+     */
+    private static int aceLocation (Hand myHand)
+    {
+        for (int i =0; i< myHand.size(); i++)
+            if (myHand.getCard(i).isAce())
+                return i;
+        return -1;
+    }
+    /**
+     * This function returns the value of the hand without the Ace, because the Ace can be 11 or 1.
+     * @param myHand
+     * @return 
+     */
+    private static int handValueMinusAce (Hand myHand)
+    {
+        int skip = aceLocation(myHand);
+        int handValue =0;
+        
+        for (int i =0; i< myHand.size(); i++)
+            if (i!=skip )
+                handValue+= myHand.getCard(i).value();
+        return handValue;    
+    }
+    /***
+     * This function converts a character from the strategyKey to an enumerated Play type.
+     * @param char t
+     * @return enum HIT, STAY, DOUBLE_DOWN, SPLIT or NONE
+     */
+    private static Play charToEnum(char t)
     {
         
         switch (t){
@@ -131,32 +193,47 @@ public class basicStrategy {
            }
         
     }
-    
-    public static char  getAdvice( Hand myHand, Card upCard)
+    /**
+     * This function returns the proper advice for the player.
+     * @param myHand
+     * @param upCard
+     * @return Play
+     */
+    private static Play getAdvice( Hand myHand, Card upCard)
     {
-        int yourHandLoc;
+        int yourHandLoc ;
         int dealerUpCardLoc;
         
-        if (myHand.isPair())//pair check
-         yourHandLoc = playerHandPairsLoc.get(myHand.getCard(0).value());
+        //if-else sets yourHandLoc to correct row location, by retriving it from the correct Hashtable
+        if (myHand.isPair())//Checks for pair, section 4
+            yourHandLoc = playerHandPairsLocs.get(myHand.getCard(0).value());  
+        
+        else if (containsAce(myHand)) //Checks for Ace, section 
+            yourHandLoc = playerHandAceLocs.get(handValueMinusAce(myHand) );
       
-        else if (myHand.getCard(0).isAce()) //Ace might be more than one
-            yourHandLoc = playerHandAceLoc.get(myHand.getCard(1).value());
-        else if (myHand.getCard(1).isAce()) //another ace check
-            yourHandLoc = playerHandAceLoc.get(myHand.getCard(0).value());
-        else 
-            yourHandLoc = playerHandValueLoc.get(myHand.getValue());
-            
+        
+        else //Uses Hand value, sections 1 and 2 
+            yourHandLoc = playerHandValueLocs.get(myHand.getValue());
+        
+        // sets dealersUpCardLoc to the correct location from the hashtable
         dealerUpCardLoc = dealerUpCardLocs.get(upCard.value());
-      
-        return strategyKey[yourHandLoc][dealerUpCardLoc];
+        
+        //retrieves the advice from stragetyKey, corresponding to the proper locations, and converts to Play type
+        return charToEnum(strategyKey[yourHandLoc][dealerUpCardLoc]);
     }
+   /**
+    * This function gets the recommended Play, for use of MyAdivsor.
+    * @param myHand
+    * @param upCard
+    * @return Play 
+    */ 
+   
     public static Play getPlay (Hand myHand, Card upCard)
     {
         //NONE, HIT, STAY, DOUBLE_DOWN, SPLIT
-        char advice = getAdvice(myHand, upCard);
-        return charToEnum(advice);
+        return getAdvice(myHand, upCard);
         
     }
+    
     
 }
