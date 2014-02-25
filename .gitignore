@@ -2,7 +2,8 @@
 /charlie/build/
 /charlie/audio
 /charlie/dist/
+/charlie/nbproject/private/
 /CharliePlugins/build/
 /CharliePlugins/dist/
-/CharliePlugins/nbproject/private/
-/CharliePlugins/nbproject/
+/CharliePlugins/
+/CharliePlugins/nbproject/private
