@@ -148,7 +148,7 @@ public class basicStrategy {
             yourHandLoc = playerHandValueLoc.get(myHand.getValue());
             
         dealerUpCardLoc = dealerUpCardLocs.get(upCard.value());
-        System.out.println(yourHandLoc +" " + dealerUpCardLoc);
+      
         return strategyKey[yourHandLoc][dealerUpCardLoc];
     }
     public static Play getPlay (Hand myHand, Card upCard)
