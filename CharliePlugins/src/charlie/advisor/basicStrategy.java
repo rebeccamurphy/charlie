@@ -6,8 +6,6 @@
 
 package charlie.advisor;
 
-import static charlie.advisor.BasicStrategy.charToEnum;
-import static charlie.advisor.BasicStrategy.getAdvice;
 import charlie.card.Card;
 import charlie.card.Hand;
 import charlie.util.Play;
