@@ -23,9 +23,9 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     // Section 1 unit tests.
     Test00_12_2.class,
-    Test00_7_A.class,
+    Test00_12_7.class,
     Test01_12_2.class,
-    Test01_7_A.class,
+    Test01_12_7.class,
     
     // Section 2 unit tests.
     Test00_5_2.class,

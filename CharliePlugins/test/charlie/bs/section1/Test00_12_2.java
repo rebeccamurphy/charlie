@@ -51,15 +51,15 @@ public class Test00_12_2 {
     @Test
     public void testRow17Plus()
     {
-        // Test row "17+"
+        // Test row "15" and collumn 4
         Hid hid = new Hid(Seat.YOU, 1.0, 1.5);
         Hand hand = new Hand(hid);
         
         hand.hit(new Card(10, Card.Suit.CLUBS));
-        hand.hit(new Card(2, Card.Suit.DIAMONDS));        
+        hand.hit(new Card(5, Card.Suit.DIAMONDS));        
         
-        Play result = advisor.advise(hand, new Card(2, Card.Suit.CLUBS));
-        Play expectedPlay = Play.HIT;
+        Play result = advisor.advise(hand, new Card(4, Card.Suit.CLUBS));
+        Play expectedPlay = Play.STAY;
         
         assertEquals(expectedPlay, result);
         

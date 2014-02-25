@@ -22,11 +22,11 @@ import static org.junit.Assert.*;
  *
  * @author Wallance Miranda
  */
-public class Test00_7_A {
+public class Test00_12_7 {
     
     private static IAdvisor advisor;
     
-    public Test00_7_A() {
+    public Test00_12_7() {
         advisor = new MyAdvisor();
     }
     
@@ -49,11 +49,12 @@ public class Test00_7_A {
     @Test
     public void test()
     {
+        //Tests row 14, collumn A
         Hid hid = new Hid(Seat.YOU, 1.0, 1.5);
         Hand hand = new Hand(hid);
         
-        hand.hit(new Card(3, Card.Suit.CLUBS));
-        hand.hit(new Card(4, Card.Suit.DIAMONDS));        
+        hand.hit(new Card(6, Card.Suit.CLUBS));
+        hand.hit(new Card(8, Card.Suit.DIAMONDS));        
         
         Play result = advisor.advise(hand, new Card(Card.ACE, Card.Suit.CLUBS));
         Play expectedPlay = Play.HIT;

@@ -49,6 +49,7 @@ public class Test00_5_2 {
     @Test
     public void test()
     {
+        //Tests row 5-8, collumn 2
         Hid hid = new Hid(Seat.YOU, 1.0, 1.5);
         Hand hand = new Hand(hid);
         

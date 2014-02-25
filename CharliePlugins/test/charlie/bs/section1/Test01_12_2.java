@@ -50,6 +50,7 @@ public class Test01_12_2 {
     @Test
     public void test()
     {
+        //Test row 12 and collumn 2
         Hid hid = new Hid(Seat.YOU, 1.0, 1.5);
         Hand hand = new Hand(hid);
         

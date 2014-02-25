@@ -22,11 +22,11 @@ import static org.junit.Assert.*;
  *
  * @author Wallance Miranda
  */
-public class Test01_7_A {
+public class Test01_12_7 {
     
     private static IAdvisor advisor;
     
-    public Test01_7_A()
+    public Test01_12_7()
     {
         advisor = new MyAdvisor();
     }
@@ -50,13 +50,14 @@ public class Test01_7_A {
     @Test
     public void test()
     {
+        //Test row 16, collumn 8
         Hid hid = new Hid(Seat.YOU, 1.0, 1.5);
         Hand hand = new Hand(hid);
         
-        hand.hit(new Card(5, Card.Suit.CLUBS));
-        hand.hit(new Card(2, Card.Suit.DIAMONDS));        
+        hand.hit(new Card(7, Card.Suit.CLUBS));
+        hand.hit(new Card(9, Card.Suit.DIAMONDS));        
         
-        Play result = advisor.advise(hand, new Card(Card.ACE, Card.Suit.CLUBS));
+        Play result = advisor.advise(hand, new Card(8, Card.Suit.CLUBS));
         Play expectedPlay = Play.HIT;
         
         assertEquals(expectedPlay, result);

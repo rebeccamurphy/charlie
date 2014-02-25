@@ -49,14 +49,15 @@ public class Test01_5_2 {
     @Test
     public void test()
     {
+        //Tests row 11, column 4
         Hid hid = new Hid(Seat.YOU, 1.0, 1.5);
         Hand hand = new Hand(hid);
         
         hand.hit(new Card(8, Card.Suit.CLUBS));
-        hand.hit(new Card(4, Card.Suit.DIAMONDS));        
+        hand.hit(new Card(3, Card.Suit.DIAMONDS));        
         
-        Play result = advisor.advise(hand, new Card(2, Card.Suit.CLUBS));
-        Play expectedPlay = Play.HIT;
+        Play result = advisor.advise(hand, new Card(4, Card.Suit.CLUBS));
+        Play expectedPlay = Play.DOUBLE_DOWN;
         
         assertEquals(expectedPlay, result);
     }
