@@ -139,38 +139,10 @@ public class basicStrategy {
     
     private static boolean containsAce (Hand myHand)
     {
-        for (int i =0; i< myHand.size(); i++)
-            if (myHand.getCard(i).isAce())
-                return true;
-        return false;
+        return myHand.getCard(1).isAce() || myHand.getCard(0).isAce();
+               
     }
-    /**
-     * This function get the location of the Ace in a hand.
-     * @param myHand
-     * @return 
-     */
-    private static int aceLocation (Hand myHand)
-    {
-        for (int i =0; i< myHand.size(); i++)
-            if (myHand.getCard(i).isAce())
-                return i;
-        return -1;
-    }
-    /**
-     * This function returns the value of the hand without the Ace, because the Ace can be 11 or 1.
-     * @param myHand
-     * @return 
-     */
-    private static int handValueMinusAce (Hand myHand)
-    {
-        int skip = aceLocation(myHand);
-        int handValue =0;
-        
-        for (int i =0; i< myHand.size(); i++)
-            if (i!=skip )
-                handValue+= myHand.getCard(i).value();
-        return handValue;    
-    }
+    
     /***
      * This function converts a character from the strategyKey to an enumerated Play type.
      * @param char t
@@ -208,9 +180,8 @@ public class basicStrategy {
         if (myHand.isPair())//Checks for pair, section 4
             yourHandLoc = playerHandPairsLocs.get(myHand.getCard(0).value());  
         
-        else if (containsAce(myHand)) //Checks for Ace, section 
-            yourHandLoc = playerHandAceLocs.get(handValueMinusAce(myHand) );
-      
+        else if (myHand.size()==2 && containsAce(myHand)) //Checks for Ace, section 3 
+            yourHandLoc = playerHandAceLocs.get(myHand.getValue() -11);
         
         else //Uses Hand value, sections 1 and 2 
             yourHandLoc = playerHandValueLocs.get(myHand.getValue());
