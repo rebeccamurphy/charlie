@@ -17,7 +17,7 @@ import java.util.Hashtable;
  *
  * @author Rebecca
  */
-public class basicStrategy {
+public class BasicStrategy {
      //Multidimensional Array containing the strategy table
      final static char[][] strategyKey= new char[][] {
        // 0    1    1    3    4    5    6    7    8    9 | Second position

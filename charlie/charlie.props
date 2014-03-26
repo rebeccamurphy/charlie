@@ -4,6 +4,6 @@ charlie.server.login.port 9000
 charlie.debug true
 charlie.shoe charlie.card.Shoe01
 charlie.advisor charlie.advisor.MyAdvisor
-#charlie.bot.b9 charlie.bot.B9
+charlie.bot.b9 charlie.bot.server.ServerBot
 #charlie.bot.n6 charlie.bot.B9
 #charlie.advisor charlie.advice.Advisor
