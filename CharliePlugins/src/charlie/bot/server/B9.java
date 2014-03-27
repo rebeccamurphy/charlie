@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package charlie.bot.server;
 
 import charlie.advisor.BasicStrategy;
@@ -16,7 +10,6 @@ import charlie.plugin.IAdvisor;
 import charlie.plugin.IBot;
 import charlie.plugin.IPlayer;
 import charlie.util.Play;
-import java.util.List;
 import java.util.Random;
 
 import charlie.util.Constant;
@@ -38,7 +31,6 @@ public class B9 implements IBot {
     protected IAdvisor advisor;
     protected Hid dealerHid;
     protected Card dealerUpCard;
-    protected BasicStrategy bs;
     protected boolean myTurn = false;
     
     protected HashMap<Hid,Hand> hands = new HashMap<>();
@@ -49,7 +41,6 @@ public class B9 implements IBot {
      */
     
     public B9 () {
-    bs = new BasicStrategy();
     }
     
      /**
@@ -121,13 +112,14 @@ public class B9 implements IBot {
     public void deal(Hid hid, Card card, int[] values) {
          LOG.info("got card = "+card+" hid = "+hid);
         
-        // If it is not my turn, there's nothing to do
+        // If its the dealer's turn 
             if(hid.getSeat() ==Seat.DEALER){
             this.dealerHid = hid;
             this.dealerUpCard = card;
             LOG.info("dealer upcard set " + card);
         }
         if (myHand.getHid() == hid && myHand.size() >2 && !(myHand.isBroke())){
+            myTurn = true;
             play(hid);
         }
 
@@ -146,79 +138,73 @@ public class B9 implements IBot {
 
     @Override
     public void win(Hid hid) {
-        //add alert for win 
+        LOG.info("WIN " + hid);
     }
 
     @Override
     public void blackjack(Hid hid) {
-       //add alert for blackjack win
+       LOG.info("BLACKJACK " + hid);
     }
 
     @Override
     public void charlie(Hid hid) {
-       //add alert for charlie win
+       LOG.info("CHARLIE " + hid);
     }
 
     @Override
     public void lose(Hid hid) {
-        //add alert for lose 
+        LOG.info("LOSE " + hid);
     }
 
     @Override
     public void push(Hid hid) {
-        //add alert for push 
+        LOG.info("PUSH " + hid);
     }
 
     @Override
     public void shuffling() {
-        //add alert for shuffling 
+        LOG.info("SHUFFLING");
     }
 
     @Override
     public void play(Hid hid) {
-       
-        // Othewise respond
         LOG.info("turn hid = "+hid); 
-        LOG.info("dealer upcard = "+ dealerUpCard); 
         Random random = new Random();
         final IPlayer bot = this;
         final Hid botHid = hid;
         final int DELAY = random.nextInt(3001-1000) +1000;
-        final int randomPlay = random.nextInt(4);
-        final int ignoreBs = DELAY % 5;
-        final Play[] plays = {Play.DOUBLE_DOWN, Play.HIT, Play.SPLIT, Play.STAY};
         
         Runnable thread = new Runnable() {
         @Override 
         public void run() {
             Play advice;
-            int ignoreBs = DELAY % 5;
             try {
                 Thread.sleep(DELAY);
             }
             catch (InterruptedException ex) {
-              LOG.info("thread error.");
+              LOG.info("Thread Error");
               }
+            //double checks to make sure it is my turn
             if (botHid == myHand.getHid()){
                 
                 advice = BasicStrategy.getPlay(myHand, dealerUpCard);
                 
                 if (advice == Play.DOUBLE_DOWN && myHand.size() == 2)
                     dealer.doubleDown(bot, botHid);
-                else if (advice == Play.SPLIT)
-                    //since split is not implemented, uses hit instead
-                    dealer.hit(bot, botHid);
                 else if (advice == Play.STAY)
                     dealer.stay(bot, botHid);
                 else
+                    //if double down is advised on more than 2 cards 
+                    //or split is advised, or hit is advised
                     dealer.hit(bot, botHid);
                 }
+            
             }
                 
         };
         new Thread(thread).start();
 
-    
+    myTurn = false;
     }
     
     
