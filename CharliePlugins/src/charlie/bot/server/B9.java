@@ -19,61 +19,118 @@ import charlie.util.Play;
 import java.util.List;
 import java.util.Random;
 
+import charlie.util.Constant;
+import java.util.HashMap;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 /**
  *
  * @author rebecca murphy
  */
-public class ServerBot implements IBot {
+public class B9 implements IBot {
     protected Hid hid;
-    protected Hand playHand;
+    private Hand myHand;
     protected Dealer dealer;
     protected Seat seat;
     protected IAdvisor advisor;
     protected Hid dealerHid;
     protected Card dealerUpCard;
     protected BasicStrategy bs;
+    protected boolean myTurn = false;
     
-    public ServerBot () {
+    protected HashMap<Hid,Hand> hands = new HashMap<>();
+    private final Logger LOG = LoggerFactory.getLogger(B9.class);
+    
+     /**
+     * Constructor
+     */
+    
+    public B9 () {
     bs = new BasicStrategy();
     }
     
+     /**
+     * Gets the bots hand.
+     * @return Hand
+     */
+    
     @Override
     public Hand getHand() {
-        return playHand;
+        return myHand;
     }
-
+    
+     /**
+     * Sets the dealer to which the bot responds.
+     * @param dealer 
+     */
+    
     @Override
     public void setDealer(Dealer dealer) {
         this.dealer = dealer;
     }
+    
+     /**
+     * Sits the bot at a given seat.
+     * @param seat Seat
+     */
 
     @Override
     public void sit(Seat seat) {
        this.seat = seat;
-       hid = new Hid(this.seat, 0,0);
-       playHand = new Hand(hid);
+       this.hid = new Hid(seat, Constant.BOT_MIN_BET, 0);   
+       this.myHand = new Hand(this.hid);
     }
     
+     /**
+     * Starts a game.
+     * @param hids Hand ids
+     * @param shoeSize Shoe size at game start before cards dealt.
+     */
 
     @Override
     public void startGame(List<Hid> hids, int shoeSize) {
-        //add log of starting game? 
+        for(Hid hid_: hids) {
+            hands.put(hid_,new Hand(hid_));
+            
+            if(hid_.getSeat() == Seat.DEALER)
+                this.dealerHid = hid_;
+        }     
     }
+    
+    /**
+     * Ends a game.
+     * @param shoeSize Shoe size at game end after cards dealt.
+     */
 
     @Override
     public void endGame(int shoeSize) {
-        //add log of in end game
+         LOG.info("received endGame shoeSize = "+shoeSize);
     }
 
+     /**
+     * Deals a card.
+     * @param hid Target hand id
+     * @param card Card
+     * @param values Hard and soft values of a hand.
+     */
+    
     @Override
     public void deal(Hid hid, Card card, int[] values) {
-        if(this.dealerHid == null && hid.getSeat() ==Seat.DEALER){
+         LOG.info("got card = "+card+" hid = "+hid);
+        
+        // If it is not my turn, there's nothing to do
+            if(hid.getSeat() ==Seat.DEALER){
             this.dealerHid = hid;
             this.dealerUpCard = card;
+            LOG.info("dealer upcard set " + card);
         }
-        if (playHand.getHid() == hid && playHand.size() >2 && !(playHand.isBroke())){
+        if (myHand.getHid() == hid && myHand.size() >2 && !(myHand.isBroke())){
             play(hid);
         }
+
             
     }
 
@@ -119,6 +176,10 @@ public class ServerBot implements IBot {
 
     @Override
     public void play(Hid hid) {
+       
+        // Othewise respond
+        LOG.info("turn hid = "+hid); 
+        LOG.info("butt = "+ dealerUpCard); 
         Random random = new Random();
         final IPlayer bot = this;
         final Hid botHid = hid;
@@ -136,12 +197,13 @@ public class ServerBot implements IBot {
                 Thread.sleep(DELAY);
             }
             catch (InterruptedException ex) {
-              //log error  
+              LOG.info("thread error.");
               }
-            if (botHid == playHand.getHid()){
-                advice = bs.getPlay(playHand, dealerUpCard);
+            if (botHid == myHand.getHid()){
                 
-                if (advice == Play.DOUBLE_DOWN && playHand.size() == 2)
+                advice = BasicStrategy.getPlay(myHand, dealerUpCard);
+                
+                if (advice == Play.DOUBLE_DOWN && myHand.size() == 2)
                     dealer.doubleDown(bot, botHid);
                 else if (advice == Play.SPLIT)
                     dealer.hit(bot, botHid);
@@ -154,6 +216,7 @@ public class ServerBot implements IBot {
                 
         };
         new Thread(thread).start();
+
     
     }
     
