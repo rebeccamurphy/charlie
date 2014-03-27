@@ -179,7 +179,7 @@ public class B9 implements IBot {
        
         // Othewise respond
         LOG.info("turn hid = "+hid); 
-        LOG.info("butt = "+ dealerUpCard); 
+        LOG.info("dealer upcard = "+ dealerUpCard); 
         Random random = new Random();
         final IPlayer bot = this;
         final Hid botHid = hid;
@@ -206,6 +206,7 @@ public class B9 implements IBot {
                 if (advice == Play.DOUBLE_DOWN && myHand.size() == 2)
                     dealer.doubleDown(bot, botHid);
                 else if (advice == Play.SPLIT)
+                    //since split is not implemented, uses hit instead
                     dealer.hit(bot, botHid);
                 else if (advice == Play.STAY)
                     dealer.stay(bot, botHid);
