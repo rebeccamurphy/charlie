@@ -202,8 +202,10 @@ public class BasicStrategy {
     public static Play getPlay (Hand myHand, Card upCard)
     {
         //NONE, HIT, STAY, DOUBLE_DOWN, SPLIT
-        return getAdvice(myHand, upCard);
         
+        if (myHand.size()>2 && DOUBLE_DOWN == getAdvice(myHand, upCard))
+            return HIT;
+        return getAdvice(myHand, upCard);
     }
     
     
