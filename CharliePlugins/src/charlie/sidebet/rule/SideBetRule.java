@@ -37,7 +37,12 @@ public class SideBetRule implements ISideBetRule {
     private final Logger LOG = LoggerFactory.getLogger(SideBetRule.class);
     
     private final Double PAYOFF_SUPER7 = 3.0;
+    private final Double PAYOFF_ROYAL_MATCH = 25.0; 
+    private final Double PAYOFF_EXACTLY_13 = 1.0; 
 
+    private double superSevenPayout;
+    private double royalMatchPayout;
+    private double exactly13Payout;
     /**
      * Apply rule to the hand and return the payout if the rule matches
      * and the negative bet if the rule does not match.
@@ -46,7 +51,9 @@ public class SideBetRule implements ISideBetRule {
      */
     @Override
     public double apply(Hand hand) {
-
+        Card card1 = hand.getCard(0); //first card in hand
+        int card1Rank = hand.getCard(0).getRank(); //first card rank in hand 
+        int card2Rank = hand.getCard(1).getRank(); //second card rank in hand
         
         Double bet = hand.getHid().getSideAmt();
         LOG.info("side bet amount = "+bet);
@@ -56,12 +63,26 @@ public class SideBetRule implements ISideBetRule {
         
         LOG.info("side bet rule applying hand = "+hand);
         
-        Card card = hand.getCard(0);
+        
  
-        if(card.getRank() == 7) {
+        if ((card1Rank == Card.KING && card2Rank ==Card.QUEEN) || 
+                (card1Rank ==Card.QUEEN&& card2Rank ==Card.KING)){
+            //checks royal match rule match
+            LOG.info("side bet ROYAL MATCH matches");
+            return bet * PAYOFF_ROYAL_MATCH;
+        }
+        else if(card1.getRank() == 7) { 
+            //checks super 7 rule match
             LOG.info("side bet SUPER 7 matches");
             return bet * PAYOFF_SUPER7;
         }
+       
+        else if (hand.getValue() == 13){
+            //checks exactly 13 match rule match
+            LOG.info("side bet EXACTLY 13 matches");
+            return bet * PAYOFF_EXACTLY_13;
+        }
+        
         
         LOG.info("side bet rule no match");
         
