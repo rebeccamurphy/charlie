@@ -52,6 +52,7 @@ public class SideBetRule implements ISideBetRule {
     @Override
     public double apply(Hand hand) {
         Card card1 = hand.getCard(0); //first card in hand
+        Card card2 = hand.getCard(1); //second card in hand
         int card1Rank = hand.getCard(0).getRank(); //first card rank in hand 
         int card2Rank = hand.getCard(1).getRank(); //second card rank in hand
         
@@ -65,8 +66,9 @@ public class SideBetRule implements ISideBetRule {
         
         
  
-        if ((card1Rank == Card.KING && card2Rank ==Card.QUEEN) || 
-                (card1Rank ==Card.QUEEN&& card2Rank ==Card.KING)){
+        if (((card1Rank == Card.KING && card2Rank ==Card.QUEEN) || 
+                (card1Rank ==Card.QUEEN&& card2Rank ==Card.KING))&&
+                    card1.getSuit() == (card2.getSuit()) ){
             //checks royal match rule match
             LOG.info("side bet ROYAL MATCH matches");
             return bet * PAYOFF_ROYAL_MATCH;
