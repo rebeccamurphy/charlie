@@ -122,7 +122,7 @@ public class Shoe extends charlie.card.Shoe {
         cards.add(new Card(Card.KING,Card.Suit.DIAMONDS));     //dealer
         
         //Test case 10
-        
+        //why does this lose the side bet? 
         cards.add(new Card(6,Card.Suit.CLUBS));                 //player
         cards.add(new Card(Card.KING,Card.Suit.SPADES));        //dealer
         

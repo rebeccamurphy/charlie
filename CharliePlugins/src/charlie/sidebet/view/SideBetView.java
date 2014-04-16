@@ -23,16 +23,22 @@
 
 package charlie.sidebet.view;
 
+import charlie.audio.Effect;
+import charlie.audio.SoundFactory;
 import charlie.card.Hid;
 import charlie.plugin.ISideBetView;
+import charlie.view.sprite.Chip;
 import charlie.view.AMoneyManager;
 
 import charlie.view.sprite.ChipButton;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +49,16 @@ import org.slf4j.LoggerFactory;
 public class SideBetView implements ISideBetView {
     private final Logger LOG = LoggerFactory.getLogger(SideBetView.class);
     
+    private static Random ran;
+    private static int sideBetAreaX;
+    private static int sideBetAreaY;
+    
     public final static int X = 400;
     public final static int Y = 200;
     public final static int DIAMETER = 50;
     
     protected Font font = new Font("Arial", Font.BOLD, 18);
+    protected Font stakesFont = new Font("Tahoma", Font.BOLD, 14);
     protected BasicStroke stroke = new BasicStroke(3);
     
     // See http://docs.oracle.com/javase/tutorial/2d/geometry/strokeandfill.html
@@ -61,9 +72,19 @@ public class SideBetView implements ISideBetView {
     protected List<ChipButton> buttons;
     protected int amt = 0;
     protected AMoneyManager moneyManager;
+    
+    protected List<Chip> sideBetChips;
+    
+    private SideBetOutcome outcome;
+    protected enum SideBetOutcome { WIN, LOSE, NONE};
 
     public SideBetView() {
+        this.sideBetChips = new ArrayList<>();
+        ran = new Random();
+        sideBetAreaX = X-DIAMETER/2;
+        sideBetAreaY = Y-DIAMETER/2;
         LOG.info("side bet view constructed");
+        outcome = SideBetOutcome.NONE;
     }
     
     /**
@@ -89,12 +110,27 @@ public class SideBetView implements ISideBetView {
         for(ChipButton button: buttons) {
             if(button.isPressed(x, y)) {
                 amt += button.getAmt();
+                int chipX = sideBetAreaX + DIAMETER + ( (this.sideBetChips.size() * 10) + ran.nextInt(15));
+                
+                // To simulate the chips being placed on the table, like a human,
+                // which doesn't space them evenly out, use randomness to adjust
+                // the X and Y coordinates.
+                int randomY = ran.nextInt(10);
+                
+                int chipY = sideBetAreaY + ( (ran.nextBoolean()) ? randomY : -randomY );
+                
+                this.sideBetChips.add(new Chip(button.getImage(), chipX, chipY, amt));
+                
                 LOG.info("A. side bet amount "+button.getAmt()+" updated new amt = "+amt);
+                
+                SoundFactory.play(Effect.CHIPS_IN);
             } 
         }
         
         if(oldAmt == amt) {
             amt = 0;
+            this.sideBetChips.clear();
+            SoundFactory.play(Effect.CHIPS_OUT);
             LOG.info("B. side bet amount cleared");
         }
     }
@@ -111,9 +147,31 @@ public class SideBetView implements ISideBetView {
             return;
 
         LOG.info("side bet outcome = "+bet);
+        this.
         
         // Update the bankroll
         moneyManager.increase(bet);
+        
+        // Determines if the bet is positive, negative or 0.
+        double signim = Math.signum(bet);
+        
+        if (signim > 0)
+        {
+            // Bet was positive.
+            this.outcome = SideBetOutcome.WIN;
+        }
+        else if (signim < 0)
+        {
+            // Bet was negative.
+            this.outcome = SideBetOutcome.LOSE;
+        }
+        else
+        {
+            // Bet was 0.
+            this.outcome = SideBetOutcome.NONE;
+        }
+        
+        LOG.info("Player " + hid.getSeat().toString() + " - Side Bet Outcome: " + this.outcome.toString()+ ".");
         
         LOG.info("new bankroll = "+moneyManager.getBankroll());
     }
@@ -123,6 +181,8 @@ public class SideBetView implements ISideBetView {
      */
     @Override
     public void starting() {
+        // Resets the outcome when the player presses the "Deal" button.
+        this.outcome = SideBetOutcome.NONE;
     }
 
     /**
@@ -139,6 +199,9 @@ public class SideBetView implements ISideBetView {
      */
     @Override
     public void update() {
+        // Note: Called continously.
+        
+        //LOG.info("THE UPDATE METHOD HAS BEEN CALLED!");
     }
 
     /**
@@ -150,11 +213,71 @@ public class SideBetView implements ISideBetView {
         // Draw the at-stake place on the table
         g.setColor(Color.RED); 
         g.setStroke(dashed);
-        g.drawOval(X-DIAMETER/2, Y-DIAMETER/2, DIAMETER, DIAMETER);
+        int ovalX = X-DIAMETER/2;
+        int ovalY = Y-DIAMETER/2;
+        g.drawOval(ovalX, ovalY, DIAMETER, DIAMETER);        
         
         // Draw the at-stake amount
+        FontMetrics fontMetrics = g.getFontMetrics(font);
+        String sideBetStakeAmountText = "" + amt;
+        int sideBetTextWidth = fontMetrics.charsWidth(sideBetStakeAmountText.toCharArray(), 0, sideBetStakeAmountText.length());
         g.setFont(font);
         g.setColor(Color.WHITE);
-        g.drawString(""+amt, X-5, Y+5);
+        int sideBetXCoordinate = ovalX + (DIAMETER/2) -(sideBetTextWidth/2);
+        g.drawString(sideBetStakeAmountText, sideBetXCoordinate, Y+5);
+        
+        // Draw the stake payouts on the table
+        g.setFont(this.stakesFont);
+        g.setColor(Color.BLACK);
+        int payoutStringX = X + 55;
+        int payoutStringY = Y + 100;
+        g.drawString("SUPER 7 pays 3:1", payoutStringX, payoutStringY);
+        g.drawString("ROYAL MATCH pays 25:1", payoutStringX, payoutStringY += 20);
+        g.drawString("EXACTLY 13 pays 1:1", payoutStringX, payoutStringY += 20);
+        
+        // Draw the chips on the table
+        ovalX += DIAMETER + 5;
+        for(int i=0; i < this.sideBetChips.size(); i++)
+        {
+            Chip chip = this.sideBetChips.get(i);
+            chip.render(g);
+        }
+        
+        // Draw WIN or LOSE label.
+        if (this.outcome != SideBetOutcome.NONE)
+                {
+            g.setFont(this.font);
+            String labelText = "";
+
+            if (this.outcome == SideBetOutcome.WIN)
+            {
+                labelText = "WIN !";
+                g.setColor(Color.GREEN);
+            }
+            else if (this.outcome == SideBetOutcome.LOSE)
+            {
+                labelText = "LOSE !";
+                g.setColor(Color.RED);
+            }
+            
+            /// Figure out the dimensions of the text based on the font.
+            FontMetrics fm = g.getFontMetrics(font);
+            int textWidth = fm.charsWidth(labelText.toCharArray(), 0, labelText.length());
+            int textHeight = fm.getHeight();
+
+            int winLoseLabelX = X + 60;
+            int winLoseLabelY = Y - 10;
+
+            // Render the colored background for the text.
+            g.fillRoundRect(winLoseLabelX-5, winLoseLabelY-textHeight+3, textWidth+8, textHeight, 5, 5);
+
+            if (this.outcome == SideBetOutcome.LOSE)
+                g.setColor(Color.WHITE);
+            else
+                g.setColor(Color.BLACK);
+
+            // Render the outcome text.
+            g.drawString(labelText, winLoseLabelX, winLoseLabelY);
+        }
     }
 }
