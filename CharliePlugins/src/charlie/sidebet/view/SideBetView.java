@@ -127,11 +127,19 @@ public class SideBetView implements ISideBetView {
             } 
         }
         
-        if(oldAmt == amt) {
-            amt = 0;
-            this.sideBetChips.clear();
-            SoundFactory.play(Effect.CHIPS_OUT);
-            LOG.info("B. side bet amount cleared");
+        int xOrigin = sideBetAreaX;
+        int xRight = xOrigin+DIAMETER;
+        int yOrigin = sideBetAreaY;
+        int yBottom = yOrigin+DIAMETER;
+        // Only clear chips if the player clicked in the side-bet-stake area.
+        if ( (x >= xOrigin) && (x <= xRight) && (y >= yOrigin) && (y <= yBottom) )
+        {
+            if(oldAmt == amt) {
+                amt = 0;
+                this.sideBetChips.clear();
+                SoundFactory.play(Effect.CHIPS_OUT);
+                LOG.info("B. side bet amount cleared");
+            }
         }
     }
 
@@ -199,9 +207,6 @@ public class SideBetView implements ISideBetView {
      */
     @Override
     public void update() {
-        // Note: Called continously.
-        
-        //LOG.info("THE UPDATE METHOD HAS BEEN CALLED!");
     }
 
     /**
@@ -213,8 +218,8 @@ public class SideBetView implements ISideBetView {
         // Draw the at-stake place on the table
         g.setColor(Color.RED); 
         g.setStroke(dashed);
-        int ovalX = X-DIAMETER/2;
-        int ovalY = Y-DIAMETER/2;
+        int ovalX = sideBetAreaX;
+        int ovalY = sideBetAreaY;
         g.drawOval(ovalX, ovalY, DIAMETER, DIAMETER);        
         
         // Draw the at-stake amount
