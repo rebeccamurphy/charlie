@@ -32,26 +32,21 @@ import java.awt.Graphics2D;
  */
 public interface IGerty extends IPlayer {
     /**
-     * Tells bot it's time to start the auto-pilot.
+     * Tells bot it's time to make a bet to start a game.
      */
     public void go( );
     
     /**
-     * Tells bot it's time to stop the auto-pilot.
-     */
-    public void halt( );
-    
-    /**
-     * Sets the courier through which bets are placed.
+     * Sets the courier actor through which we communicate with the controller.
      * @param courier Courier
      */
     public void setCourier(Courier courier);
     
     /**
-     * Sets the money manager for placing bets.
-     * @param mi 
+     * Sets the money manager for managing bets.
+     * @param moneyManager Money manager
      */
-    public void setMoneyManager(AMoneyManager mi);
+    public void setMoneyManager(AMoneyManager moneyManager);
     
     /**
      * Updates the bot.

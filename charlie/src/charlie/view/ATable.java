@@ -25,6 +25,7 @@ package charlie.view;
 import charlie.plugin.IUi;
 import charlie.view.sprite.TurnIndicator;
 import charlie.GameFrame;
+import charlie.actor.Courier;
 import charlie.audio.Effect;
 import charlie.audio.SoundFactory;
 import charlie.card.Hid;
@@ -61,7 +62,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class ATable extends JPanel implements Runnable, IUi, MouseListener {
     private final Logger LOG = LoggerFactory.getLogger(ATable.class);
-    protected final String SIDE_BET_VIEW_PROPERTY = "charlie.sidebet.view";    
     protected Random ran = new Random();
     protected String[] b9s = {"Apollo", "Zeus", "Talos"};
     protected String[] n6s = {"Hera", "Athena", "Hecate"};
@@ -101,7 +101,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     protected Image trayImg;
     protected ABurnCard burnCard = new ABurnCard();
     protected int numHands;
-    protected int looserCount;
+    protected int loserCount;
     protected int pushCount;
     protected int winnerCount;
     protected ISideBetView sideBetView;
@@ -109,6 +109,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     protected IGerty gerty;
     private Card holeCard;
     private int[] holeValues;
+    protected Courier courier;
 
     /**
      * Constructor
@@ -147,8 +148,12 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
      * Clears table of old bets, etc.
      */
     public void clear() {
-        winnerCount = looserCount = pushCount = 0;
-
+        winnerCount = loserCount = pushCount = 0;
+        
+        for (AHandsManager animator : seats.values()) {
+            animator.clear();
+        }
+        
         for (Hid hid : manos.keySet()) {
             AMoneyManager money = monies.get(hid.getSeat());
 
@@ -168,9 +173,9 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     }
 
     /**
-     * Gets the main bet amount on the table.<br>
-     * This should only be requested when making a bet but before the table
-     * has been cleared
+     * Gets the main upBet amount on the table.<br>
+ This should only be requested when making a upBet but before the table
+ has been clearBeted
      * @return Bet amount
      */
     public Integer getBetAmt() {
@@ -182,8 +187,8 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     }
     
     /**
-     * Gets the side bet amount on the table.
-     * @return Side bet amount
+     * Gets the side upBet amount on the table.
+     * @return Side upBet amount
      */
     public Integer getSideAmt() {
         int amt = 0;
@@ -211,20 +216,20 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     /**
      * Paints the display some time after repainted invoked.
      *
-     * @param _g
+     * @param g_
      */
     @Override
-    public synchronized void paint(Graphics _g) {
-        super.paint(_g);
+    public synchronized void paint(Graphics g_) {
+        super.paint(g_);
 
-        Graphics2D g = (Graphics2D) _g;
+        Graphics2D g = (Graphics2D) g_;
 
         // Render the paraphenelia
         g.drawImage(this.instrImg, 140, 208, this);
         g.drawImage(this.shoeImg, 540, 5, this);
         g.drawImage(this.trayImg, 430, 5, this);
 
-        // Render the bet on the table
+        // Render the upBet on the table
         this.monies.get(Seat.YOU).render(g);
 
         // Render the hands
@@ -232,7 +237,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
             handsManager[i].render(g);
         }
         
-        // Render the side bet
+        // Render the side upBet
         if(sideBetView != null)
             sideBetView.render(g);
 
@@ -240,10 +245,13 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
         if(burnCard.isVisible())
             burnCard.render(g);
         
+        if(gerty != null)
+            gerty.render(g);
+        
         // Java tool related stuff
         Toolkit.getDefaultToolkit().sync();
 
-        _g.dispose();
+        g_.dispose();
     }
 
     /**
@@ -255,7 +263,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
             handsManager[i].update();
         }
         
-        // Update the side bet
+        // Update the side upBet
         if(sideBetView != null)
             sideBetView.update(); 
         
@@ -275,6 +283,9 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
         }
         
         burnCard.update();
+        
+        if(gerty != null)
+            gerty.update();
        
     }
 
@@ -325,7 +336,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     }
 
     /**
-     * Enables betting (i.e., the keys work)
+     * Enables upBetting (i.e., the keys work)
      *
      * @param betting True or false
      */
@@ -334,7 +345,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     }
 
     /**
-     * Double bet on the table.
+     * Double upBet on the table.
      *
      * @param hid Hand id
      */
@@ -350,7 +361,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
      * @param hid Hand id
      */
     @Override
-    public void turn(Hid hid) {
+    public void turn(final Hid hid) {
         AHand hand = manos.get(hid);
 
         if (hid.getSeat() == Seat.DEALER) {
@@ -392,8 +403,16 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
                 this.frame.enableTrucking(enable);
                 this.frame.enablePlay(enable);
             }
-            else
-                gerty.play(hid);
+            else {
+                new Thread(new Runnable() { 
+                    @Override
+                    public void run() {
+                        gerty.play(hid);
+                    }
+                }).start();
+
+            }
+            
             SoundFactory.play(Effect.TURN);
         }
     }
@@ -406,7 +425,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
      * @param handValues Hand values
      */
     @Override
-    public synchronized void deal(Hid hid, Card card, int[] handValues) {
+    public synchronized void deal(final Hid hid, final Card card, final int[] handValues) {
         // Get the burn card off the table
         burnCard.clear();
         
@@ -436,8 +455,15 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
             this.holeCard = card;
         }
         
-        if(gerty != null && !(card instanceof HoleCard))
-            gerty.deal(hid, card, handValues);
+        if (gerty != null && !(card instanceof HoleCard)) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    gerty.deal(hid, card, handValues);
+                }
+            }).start();
+        }
+            
     }
 
     /**
@@ -459,7 +485,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
 
         if (hid.getSeat() != Seat.DEALER) {
             SoundFactory.play(Effect.BUST);
-            looserCount++;
+            loserCount++;
         }
         
         if(sideBetView != null)
@@ -501,7 +527,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
      * @param hid Hand id
      */
     @Override
-    public void loose(Hid hid) {
+    public void lose(Hid hid) {
         LOG.info("LOOSE for hid = "+hid+" amt = "+hid.getAmt());
         
         AHand hand = manos.get(hid);
@@ -512,7 +538,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
 
         money.decrease(hid.getAmt());
 
-        looserCount++;
+        loserCount++;
         
         if(sideBetView != null)
             sideBetView.ending(hid);
@@ -614,11 +640,13 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
      */
     @Override
     public void starting(List<Hid> hids, int shoeSize) {
-        numHands = hids.size();
+        clear();
         
-        for (AHandsManager animator : seats.values()) {
-            animator.clear();
-        }
+        numHands = hids.size();
+//        
+//        for (AHandsManager animator : seats.values()) {
+//            animator.clear();
+//        }
 
         this.shoeSize = shoeSize;
 
@@ -652,10 +680,10 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
      * @param shoeSize Shoe size
      */
     @Override
-    public void ending(int shoeSize) {
+    public void ending(final int shoeSize) {
         LOG.info("num hands = "+numHands);
         LOG.info("winner count = "+winnerCount);
-        LOG.info("looser count = "+looserCount);
+        LOG.info("looser count = "+loserCount);
         LOG.info("push count = "+pushCount);
         
         // Game now over
@@ -669,15 +697,32 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
             frame.enableDeal(true);
             this.bettable = true;
 
-            // Disable play -- we must wait for player to bet and request deal
+            // Disable play -- we must wait for player to upBet and request deal
             frame.enablePlay(false);
         }
-        else
-            gerty.endGame(shoeSize);
+        else {
+            // Run gerty in worker thread in event there's a need for
+            // endGame to wait between games.
+            new Thread(new Runnable() { 
+                @Override
+                public void run() {
+                    try {
+                        gerty.endGame(shoeSize);
+                        
+                        Thread.sleep(2000);
+                        
+                        gerty.go();
+                    } catch (InterruptedException ex) {
+                        
+                    }
+                }
+            }).start();
+
+        }
 
         if (winnerCount == numHands - 1) {
             SoundFactory.play(Effect.NICE);
-        } else if (looserCount == numHands - 1) {
+        } else if (loserCount == numHands - 1) {
             SoundFactory.play(Effect.TOUGH);
         } else if (pushCount == numHands - 1) {
             SoundFactory.play(Effect.PUSH);
@@ -702,7 +747,7 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     }
 
     /**
-     * Register bets.
+     * Register upBets.
      *
      * @param e Event
      */
@@ -714,16 +759,16 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
         if (!bettable)
             return;
 
-        // Get the coordinates of the mouse and let bet manager
-        // determine whether this is a bet and how much.
+        // Get the coordinates of the mouse and let upBet manager
+        // determine whether this is a upBet and how much.
         int x = e.getX();
         int y = e.getY();
 
-        // Place main bet on left-click
+        // Place main upBet on left-click
         if(SwingUtilities.isLeftMouseButton(e))
             monies.get(Seat.YOU).click(x, y);
         
-        // Ditto for the side bet system on right-click
+        // Ditto for the side upBet system on right-click
         if(sideBetView != null && SwingUtilities.isRightMouseButton(e))
             sideBetView.click(x, y);
     }
@@ -750,30 +795,99 @@ public final class ATable extends JPanel implements Runnable, IUi, MouseListener
     }
     
     /**
-     * Loads the side bet rule.
+     * Sets the courier.
+     * @param courier Courier
+     */
+    @Override
+    public void setCourier(Courier courier) {
+        this.courier = courier;
+    }
+    
+    /**
+     * Tests whether the gerty has been installed.
+     * @return 
+     */
+    public boolean autopilotEngaged() {
+        return gerty != null;
+    }
+    
+    /**
+     * Starts the gerty.
+     */
+    public void startAutopilot() {
+        this.gerty.setMoneyManager(this.monies.get(Seat.YOU));
+        this.gerty.setCourier(courier);       
+        if (gerty != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    gerty.go();
+                }
+            }).start();
+        }
+    }
+    
+    /**
+     * Loads the plug-ins.
      */
     protected void loadConfig() { 
         try {
             // Open the configuration file
             props = new Properties();
             props.load(new FileInputStream("charlie.props"));
-            
-            // Get the side bet view
-            String className = props.getProperty(SIDE_BET_VIEW_PROPERTY);
 
+        } catch (IOException ex) {
+            LOG.error("failed to open charlie.props: "+ex);
+            return;
+        }
+        
+        loadSideBetSystem();
+        loadAutoPilot();
+    } 
+    
+    /**
+     * Loads the side upBet system based on the property file setting.
+     */
+    protected void loadSideBetSystem() {
+        try {
+            String className = props.getProperty(Constant.PROPERTY_SIDE_BET_VIEW);
+            
             if (className == null)
                 return;
- 
+            
             Class<?> clazz;
+            
             clazz = Class.forName(className);
-
+            
             this.sideBetView = (ISideBetView) clazz.newInstance();
             
-            this.sideBetView.setMoneyManager(this.monies.get(Seat.YOU));
-
-            LOG.info("successfully loaded side bet rule");
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IOException ex) {
-            LOG.error("side bet view failed to load: " + ex);
+            this.sideBetView.setMoneyManager(this.monies.get(Seat.YOU)); 
+            
+            LOG.info("successfully loaded side bet view");
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            LOG.error("failed to load side bet view: "+ex);
+        }
+    }
+    
+    /**
+     * Loads the gerty based on the property file setting.
+     */
+    protected void loadAutoPilot() {
+        try {
+            String className = props.getProperty(Constant.PROPERTY_GERTY);
+            
+            if (className == null)
+                return;
+            
+            Class<?> clazz;
+            
+            clazz = Class.forName(className);
+            
+            this.gerty = (IGerty) clazz.newInstance();
+                        
+            LOG.info("successfully loaded autopilot");
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            LOG.error("failed to load autopilog: "+ex);
         }
     }    
 }

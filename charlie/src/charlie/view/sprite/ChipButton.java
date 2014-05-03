@@ -114,4 +114,12 @@ public class ChipButton {
     public Image getImage() {
         return up;
     }
+    
+    /**
+     * Presses this button.
+     */
+    public void pressed() {
+        pressed = true;
+        ready = false;        
+    }
 }

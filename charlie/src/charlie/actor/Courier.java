@@ -72,6 +72,8 @@ public class Courier {
      */
     public Courier(IUi ui) {
         this.ui = ui;
+        
+        ui.setCourier(this);
     }
     
     /**
@@ -131,7 +133,7 @@ public class Courier {
         else if(outcome instanceof Push)
             ui.push(hid);
         else if(outcome instanceof Loose)
-            ui.loose(hid);
+            ui.lose(hid);
         else if(outcome instanceof Bust)
             ui.bust(hid);
         else

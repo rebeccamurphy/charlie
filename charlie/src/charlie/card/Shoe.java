@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements a six deck shoe, the standard in many houses.
@@ -35,6 +37,8 @@ import java.util.Random;
  * @author Ron Coleman
  */
 public class Shoe  implements IShoe {
+    private final Logger LOG = LoggerFactory.getLogger(Shoe.class);
+    
     protected Integer numDecks = 6;
     protected List<Card> cards = new ArrayList<>();
     protected Integer index = 0;
@@ -89,7 +93,8 @@ public class Shoe  implements IShoe {
         
         index = 0;
                 
-        burnIndex = cards.size() - ran.nextInt(26);
+        burnIndex = cards.size() - ran.nextInt(13) - 13;
+        LOG.info("shuffling burn index = "+burnIndex);
     }
     
     /**
@@ -98,8 +103,12 @@ public class Shoe  implements IShoe {
      */
     @Override
     public Card next() {
-        if(index >= cards.size())
+        LOG.info("cards size = "+cards.size()+" burn index = "+burnIndex+" index = "+index);
+        
+        if(index >= cards.size()) {
+            LOG.error("shoe empty!");
             return null;
+        }
         
         return cards.get(index++);
     }
@@ -118,6 +127,7 @@ public class Shoe  implements IShoe {
      */
     @Override
     public boolean shuffleNeeded() {
+        LOG.info("index = "+index+" burnIndex = "+burnIndex+" shuffle needed = "+(index>=burnIndex));
         return index >= burnIndex;
     }
     

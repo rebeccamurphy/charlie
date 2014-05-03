@@ -35,6 +35,10 @@ public class Constant {
     public final static Double PLAYER_BANKROLL = 1000.0;
     public final static Double BOT_BANKROLL = 1000.0;
     public final static Double BOT_MIN_BET = 5.0;
+    public final static Integer MIN_BET = 5;
     public final static int SHOE_X = 500;
     public final static int SHOE_Y = 0;
+    public final static String PROPERTY_SIDE_BET_RULE = "charlie.sidebet.rule";     
+    public final static String PROPERTY_SIDE_BET_VIEW = "charlie.sidebet.view"; 
+    public final static String PROPERTY_GERTY = "charlie.bot.gerty";     
 }

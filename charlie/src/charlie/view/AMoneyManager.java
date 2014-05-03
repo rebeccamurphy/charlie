@@ -35,6 +35,8 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 /**
@@ -47,7 +49,7 @@ public class AMoneyManager {
     public final static int HOME_X = 210;
     public final static int HOME_Y = 355;
     
-    // Stake home (ie, the bet amount actually at stake)
+    // Stake home (ie, the upBet amount actually at stake)
     public final static int STAKE_HOME_X = 255;
     public final static int STAKE_HOME_Y = 130; 
     
@@ -235,29 +237,26 @@ public class AMoneyManager {
         for(int i=0; i < buttons.size(); i++) {
             ChipButton button = buttons.get(i);
             if(button.isReady() && button.isPressed(x,y)) {
-                int n = chips.size();
-                
-                int placeX = PLACE_HOME_X + n * width/3 + ran.nextInt(10)-10;
-                
-                int placeY = PLACE_HOME_Y + ran.nextInt(5)-5;
-                
-                Chip chip = new Chip(button.getImage(),placeX,placeY,amounts[i]);
-                
-                chips.add(chip);
-                
-                wager.increase(amounts[i]);
-                
-                SoundFactory.play(Effect.CHIPS_IN);
+                upBet(amounts[i],false);
+//                int n = chips.size();
+//                
+//                int placeX = PLACE_HOME_X + n * width/3 + ran.nextInt(10)-10;
+//                
+//                int placeY = PLACE_HOME_Y + ran.nextInt(5)-5;
+//                
+//                Chip chip = new Chip(button.getImage(),placeX,placeY,amounts[i]);
+//                
+//                chips.add(chip);
+//                
+//                wager.increase(amounts[i]);
+//                
+//                SoundFactory.play(Effect.CHIPS_IN);
             }
         }
         
         // Check for wager reset
         if(this.wager.isPressed(x, y)) {
-            this.wager.zero();
-            
-            chips.clear();
-            
-            SoundFactory.play(Effect.CHIPS_OUT);
+            clearBet();
         }
     }
     
@@ -277,5 +276,69 @@ public class AMoneyManager {
      */
     public List<ChipButton> getButtons() {
         return this.buttons;
+    }
+    
+    /**
+     * Increases the wager.
+     * @param amt Amount
+     * @param autorelease For real player this is false, for bots true
+     */
+    public void upBet(Integer amt, boolean autorelease) {
+        for (ChipButton button : buttons) {
+            if (button.getAmt() != amt) {
+                continue;
+            }
+
+            button.pressed();
+
+            int n = chips.size();
+
+            int placeX = PLACE_HOME_X + n * width / 3 + ran.nextInt(10) - 10;
+
+            int placeY = PLACE_HOME_Y + ran.nextInt(5) - 5;
+
+            Chip chip = new Chip(button.getImage(), placeX, placeY, amt);
+
+            chips.add(chip);
+
+            wager.increase(amt);
+
+            SoundFactory.play(Effect.CHIPS_IN);
+
+            // Releases the chip button, if needed
+            if (autorelease) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(250);
+                            unclick();
+                        } catch (InterruptedException ex) {
+
+                        }
+                    }
+                }).start();
+            }
+            return;
+        }
+    }
+    
+    /**
+     * Increases the bet amount.
+     * @param amt Amount of increase
+     */
+    public void upBet(Integer amt) {
+        this.upBet(amt,true);
+    }
+    
+    /**
+     * Clears the bet amount
+     */
+    public void clearBet() {
+        this.wager.zero();
+
+        chips.clear();
+
+        SoundFactory.play(Effect.CHIPS_OUT);     
     }
 }

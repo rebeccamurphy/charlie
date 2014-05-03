@@ -91,6 +91,7 @@ public class GameFrame extends javax.swing.JFrame {
     protected IAdvisor advisor;
     protected Hand dealerHand;
     private Properties props;
+    protected boolean flyingOnManual = true;
 
     /**
      * Constructor
@@ -278,8 +279,6 @@ public class GameFrame extends javax.swing.JFrame {
                 }
             }
 
-//            clientTopology.shutdown();
-
             return true;
         } catch (IOException | ClassNotFoundException e) {
             LOG.info("failed to connect to server: " + e);
@@ -332,11 +331,11 @@ public class GameFrame extends javax.swing.JFrame {
      * @param state State
      */
     public void enablePlay(boolean state) {
-        this.hitButton.setEnabled(state && trucking);
+        this.hitButton.setEnabled(state && trucking && flyingOnManual);
 
-        this.stayButton.setEnabled(state && trucking);
+        this.stayButton.setEnabled(state && trucking && flyingOnManual);
 
-        this.ddownButton.setEnabled(state && dubblable && trucking);
+        this.ddownButton.setEnabled(state && dubblable && trucking && flyingOnManual);
     }
 
     /**
@@ -505,11 +504,18 @@ public class GameFrame extends javax.swing.JFrame {
                                 JOptionPane.INFORMATION_MESSAGE);
 
                         frame.accessButton.setText("Logout");
+                        
+                        if (panel.autopilotEngaged()) {
+                            panel.startAutopilot();
 
-                        frame.enableDeal(true);
+                            frame.flyingOnManual = false;
+                        }
+                        
+                        frame.enableDeal(flyingOnManual);
                         
                         if(advisor != null)
-                            frame.adviseCheckBox.setEnabled(true);
+                            frame.adviseCheckBox.setEnabled(flyingOnManual);
+                        
                     } else {
                         JOptionPane.showMessageDialog(frame,
                                 "Failed to connect to server.",

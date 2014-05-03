@@ -56,7 +56,6 @@ import org.slf4j.LoggerFactory;
  */
 public class Dealer implements Serializable { 
     private final Logger LOG = LoggerFactory.getLogger(Dealer.class);  
-    protected final String SIDE_BET_RULE_PROPERTY = "charlie.sidebet.rule";    
     protected final static Double BLACKJACK_PAYS = 3/2.;
     protected final static Double CHARLIE_PAYS = 2/1.;
     protected final static Double PROFIT = 1.0;
@@ -651,7 +650,7 @@ public class Dealer implements Serializable {
      * Loads the side bet rule.
      */
     protected final void loadSideRule() {        
-        String className = house.getProps().getProperty(SIDE_BET_RULE_PROPERTY);
+        String className = house.getProps().getProperty(Constant.PROPERTY_SIDE_BET_RULE);
         
         if(className == null) 
             return;
