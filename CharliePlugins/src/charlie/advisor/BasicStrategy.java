@@ -11,6 +11,7 @@ import charlie.card.Hand;
 import charlie.util.Play;
 import static charlie.util.Play.*;
 import java.util.Hashtable;
+import sun.rmi.runtime.Log;
 
 
 /**
@@ -184,6 +185,7 @@ public class BasicStrategy {
             yourHandLoc = playerHandAceLocs.get(myHand.getValue() -11);
         
         else //Uses Hand value, sections 1 and 2 
+            System.out.println(myHand.getValue());
             yourHandLoc = playerHandValueLocs.get(myHand.getValue());
         
         // sets dealersUpCardLoc to the correct location from the hashtable

@@ -51,7 +51,7 @@ public class Shoe extends charlie.card.Shoe {
         cards.add(new Card(8,Card.Suit.DIAMONDS));      //dealer
         
         cards.add(new Card(3,Card.Suit.CLUBS));         //player
-        
+       /* 
         // Test case #3
         cards.add(new Card(9,Card.Suit.HEARTS));        //player
         cards.add(new Card(Card.KING,Card.Suit.CLUBS)); //dealer
@@ -128,7 +128,7 @@ public class Shoe extends charlie.card.Shoe {
         cards.add(new Card(8,Card.Suit.SPADES));               //player
         cards.add(new Card(6,Card.Suit.DIAMONDS));             //dealer
         
-        cards.add(new Card(Card.KING,Card.Suit.DIAMONDS));     //dealer
+        cards.add(new Card(Card.KING,Card.Suit.DIAMONDS)); */    //dealer
     }
     
     @Override

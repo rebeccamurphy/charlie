@@ -18,7 +18,6 @@ import charlie.util.Play;
 public class MyAdvisor implements IAdvisor {
 //  Hit =H, Stand =A, DD= D, SP =P
     @Override
-
     public Play advise(Hand myHand, Card upCard) {
         
         return BasicStrategy.getPlay(myHand, upCard);
